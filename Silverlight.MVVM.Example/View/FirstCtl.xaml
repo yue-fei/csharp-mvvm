@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Silverlight.MVVM.Example.View.FirstCtl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"       
+    mc:Ignorable="d" d:DesignHeight="400" d:DesignWidth="600">
+
+    <Grid Margin="10" x:Name="LayoutRoot" DataContext="{Binding FirstCtlViewModel,Source={StaticResource Locator}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <TextBlock Text="first view" />
+        <Grid Grid.Row="1" Margin="0 10 0 0">
+            <TextBox x:Name="tb" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                 HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
+                 Text="{Binding TextContent,Mode=TwoWay}" TextWrapping="Wrap" AcceptsReturn="True">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="TextChanged">
+                        <i:InvokeCommandAction Command="{Binding TextChangedCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
+            </TextBox>
+        </Grid>
+    </Grid>
+</UserControl>

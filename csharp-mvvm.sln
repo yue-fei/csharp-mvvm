@@ -1,0 +1,59 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.24720.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silverlight.MVVM.Core", "Silverlight.MVVM.Core\Silverlight.MVVM.Core.csproj", "{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silverlight.MVVM.Example", "Silverlight.MVVM.Example\Silverlight.MVVM.Example.csproj", "{4268752C-8DB6-450C-818F-E652460292A7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Silverlight.MVVM.Example.Web", "Silverlight.MVVM.Example.Web\Silverlight.MVVM.Example.Web.csproj", "{752D4EAA-3333-434F-B577-D8AB742EF39D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Silverlight", "Silverlight", "{2A5039CB-75B0-4E05-8BD3-4EC0B7B37F2B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WPF", "WPF", "{6AA93D89-068C-4F47-B9B6-BF3C40B1E8D9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "WP", "WP", "{D0403E25-FAC0-47E6-A123-3616CEFC57A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.MVVM.Core", "WPF.MVVM.Core\WPF.MVVM.Core.csproj", "{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WPF.MVVM.Example", "WPF.MVVM.Example\WPF.MVVM.Example.csproj", "{5BB315E5-0CFA-4AD1-8210-FD3725D27F14}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4268752C-8DB6-450C-818F-E652460292A7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4268752C-8DB6-450C-818F-E652460292A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4268752C-8DB6-450C-818F-E652460292A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4268752C-8DB6-450C-818F-E652460292A7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{752D4EAA-3333-434F-B577-D8AB742EF39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{752D4EAA-3333-434F-B577-D8AB742EF39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{752D4EAA-3333-434F-B577-D8AB742EF39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{752D4EAA-3333-434F-B577-D8AB742EF39D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BB315E5-0CFA-4AD1-8210-FD3725D27F14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BB315E5-0CFA-4AD1-8210-FD3725D27F14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BB315E5-0CFA-4AD1-8210-FD3725D27F14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BB315E5-0CFA-4AD1-8210-FD3725D27F14}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B1EE2183-6D67-49C7-A60F-BC6EB07D1E67} = {2A5039CB-75B0-4E05-8BD3-4EC0B7B37F2B}
+		{4268752C-8DB6-450C-818F-E652460292A7} = {2A5039CB-75B0-4E05-8BD3-4EC0B7B37F2B}
+		{752D4EAA-3333-434F-B577-D8AB742EF39D} = {2A5039CB-75B0-4E05-8BD3-4EC0B7B37F2B}
+		{E242EEDC-BC68-4740-A9E7-41FE33A9DBDB} = {6AA93D89-068C-4F47-B9B6-BF3C40B1E8D9}
+		{5BB315E5-0CFA-4AD1-8210-FD3725D27F14} = {6AA93D89-068C-4F47-B9B6-BF3C40B1E8D9}
+	EndGlobalSection
+EndGlobal
