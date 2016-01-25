@@ -439,11 +439,6 @@ namespace WPF.MVVM.Core
             }
             return rst;
         }
-
-        public void DestoryBackgroudView()
-        {
-
-        }
     }
     #endregion
 }

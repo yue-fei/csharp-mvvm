@@ -16,16 +16,6 @@
             <Button Margin="10" Content="show view" Command="{Binding ShowCommand}" />
         </StackPanel>
         <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
-            </Grid.ColumnDefinitions>
-            <ContentControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                        Content="{Binding FirstContent}" />
-            <ContentControl Grid.Column="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                        HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch"
-                        Content="{Binding SecondContent}" />
         </Grid>
     </Grid>
 </Window>

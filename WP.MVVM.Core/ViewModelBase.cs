@@ -4,10 +4,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Windows.Controls;
-using System.Windows;
+using System.Runtime.CompilerServices;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml;
 
-namespace Silverlight.MVVM.Core
+namespace WP.MVVM.Core
 {
     #region  ICleanup
     /// <summary>
@@ -42,10 +43,6 @@ namespace Silverlight.MVVM.Core
         /// Occurs after a property value changes.
         /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
-
-        /// <summary>
-        /// Provides access to the PropertyChanged event handler to derived classes.
-        /// </summary>
         protected PropertyChangedEventHandler PropertyChangedHandler
         {
             get
@@ -59,14 +56,15 @@ namespace Silverlight.MVVM.Core
         /// can be called before the property is used, for instance before
         /// calling RaisePropertyChanged. It avoids errors when a property name
         /// is changed but some places are missed.
-        /// <para>This method is only active in DEBUG mode.</para>
         /// </summary>
-        /// <param name="propertyName"></param>
+        /// <remarks>This method is only active in DEBUG mode.</remarks>
+        /// <param name="propertyName">The name of the property that will be
+        /// checked.</param>
         [Conditional("DEBUG"), DebuggerStepThrough]
         public void VerifyPropertyName(string propertyName)
         {
             Type type = base.GetType();
-            if (!string.IsNullOrEmpty(propertyName) && type.GetProperty(propertyName) == null)
+            if (!string.IsNullOrEmpty(propertyName) && type.GetTypeInfo().GetDeclaredProperty(propertyName) == null)
             {
                 throw new ArgumentException("Property not found", propertyName);
             }
@@ -80,12 +78,12 @@ namespace Silverlight.MVVM.Core
         /// exception is thrown in DEBUG configuration only.</remarks>
         /// <param name="propertyName">The name of the property that
         /// changed.</param>
-        protected virtual void RaisePropertyChanged(string propertyName)
+        protected virtual void RaisePropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
             if (propertyChanged != null)
             {
-                propertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                propertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
@@ -101,10 +99,11 @@ namespace Silverlight.MVVM.Core
             PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
             if (propertyChanged != null)
             {
-                string propertyName = this.GetPropertyName<T>(propertyExpression);
-                propertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                string propertyName = ObservableObject.GetPropertyName<T>(propertyExpression);
+                propertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
         /// <summary>
         /// Extracts the name of a property from an expression.
         /// </summary>
@@ -113,7 +112,7 @@ namespace Silverlight.MVVM.Core
         /// <returns>The name of the property returned by the expression.</returns>
         /// <exception cref="T:System.ArgumentNullException">If the expression is null.</exception>
         /// <exception cref="T:System.ArgumentException">If the expression does not represent a property.</exception>
-        protected string GetPropertyName<T>(Expression<Func<T>> propertyExpression)
+        protected static string GetPropertyName<T>(Expression<Func<T>> propertyExpression)
         {
             if (propertyExpression == null)
             {
@@ -131,6 +130,7 @@ namespace Silverlight.MVVM.Core
             }
             return propertyInfo.Name;
         }
+
         /// <summary>
         /// Assigns a new value to the property. Then, raises the
         /// PropertyChanged event if needed. 
@@ -155,6 +155,7 @@ namespace Silverlight.MVVM.Core
             this.RaisePropertyChanged<T>(propertyExpression);
             return true;
         }
+
         /// <summary>
         /// Assigns a new value to the property. Then, raises the
         /// PropertyChanged event if needed. 
@@ -179,6 +180,25 @@ namespace Silverlight.MVVM.Core
             this.RaisePropertyChanged(propertyName);
             return true;
         }
+
+        /// <summary>
+        /// Assigns a new value to the property. Then, raises the
+        /// PropertyChanged event if needed. 
+        /// </summary>
+        /// <typeparam name="T">The type of the property that
+        /// changed.</typeparam>
+        /// <param name="field">The field storing the property's value.</param>
+        /// <param name="newValue">The property's value after the change
+        /// occurred.</param>
+        /// <param name="propertyName">(optional) The name of the property that
+        /// changed.</param>
+        /// <returns>True if the PropertyChanged event has been raised,
+        /// false otherwise. The event is not raised if the old
+        /// value is equal to the new value.</returns>
+        protected bool Set<T>(ref T field, T newValue, [CallerMemberName] string propertyName = null)
+        {
+            return this.Set<T>(propertyName, ref field, newValue);
+        }
     }
     #endregion
 
@@ -202,6 +222,7 @@ namespace Silverlight.MVVM.Core
 
         private static bool? _isInDesignMode;
         private IMessenger _messengerInstance;
+
         /// <summary>
         /// Gets a value indicating whether the control is in design mode
         /// (running under Blend or Visual Studio).
@@ -213,6 +234,7 @@ namespace Silverlight.MVVM.Core
                 return ViewModelBase.IsInDesignModeStatic;
             }
         }
+
         /// <summary>
         /// Gets a value indicating whether the control is in design mode
         /// (running in Blend or Visual Studio).
@@ -223,11 +245,12 @@ namespace Silverlight.MVVM.Core
             {
                 if (!ViewModelBase._isInDesignMode.HasValue)
                 {
-                    ViewModelBase._isInDesignMode = new bool?(DesignerProperties.IsInDesignTool);
+                    ViewModelBase._isInDesignMode = new bool?(ViewModelBase.IsInDesignModePortable());
                 }
                 return ViewModelBase._isInDesignMode.Value;
             }
         }
+
         /// <summary>
         /// Gets or sets an instance of a <see cref="T:GalaSoft.MvvmLight.Messaging.IMessenger" /> used to
         /// broadcast messages to other objects. If null, this class will
@@ -244,14 +267,15 @@ namespace Silverlight.MVVM.Core
                 this._messengerInstance = value;
             }
         }
+
         /// <summary>
         /// Initializes a new instance of the ViewModelBase class.
         /// </summary>
         public ViewModelBase()
             : this(null)
         {
-
         }
+
         /// <summary>
         /// Initializes a new instance of the ViewModelBase class.
         /// </summary>
@@ -263,6 +287,99 @@ namespace Silverlight.MVVM.Core
         {
             this.MessengerInstance = messenger;
         }
+        private static bool IsInDesignModePortable()
+        {
+            DesignerPlatformLibrary detectedDesignerLibrary = DesignerLibrary.DetectedDesignerLibrary;
+            if (detectedDesignerLibrary == DesignerPlatformLibrary.WinRT)
+            {
+                return ViewModelBase.IsInDesignModeMetro();
+            }
+            if (detectedDesignerLibrary == DesignerPlatformLibrary.Silverlight)
+            {
+                bool flag = ViewModelBase.IsInDesignModeSilverlight();
+                if (!flag)
+                {
+                    flag = ViewModelBase.IsInDesignModeNet();
+                }
+                return flag;
+            }
+            return detectedDesignerLibrary == DesignerPlatformLibrary.Net && ViewModelBase.IsInDesignModeNet();
+        }
+        private static bool IsInDesignModeSilverlight()
+        {
+            bool result;
+            try
+            {
+                Type type = Type.GetType("System.ComponentModel.DesignerProperties, System.Windows, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e");
+                PropertyInfo declaredProperty = type.GetTypeInfo().GetDeclaredProperty("IsInDesignTool");
+                result = (bool)declaredProperty.GetValue(null, null);
+            }
+            catch 
+            {
+                result = false;
+            }
+            return result;
+        }
+        private static bool IsInDesignModeMetro()
+        {
+            bool result;
+            try
+            {
+                Type type = Type.GetType("Windows.ApplicationModel.DesignMode, Windows, ContentType=WindowsRuntime");
+                PropertyInfo declaredProperty = type.GetTypeInfo().GetDeclaredProperty("DesignModeEnabled");
+                result = (bool)declaredProperty.GetValue(null, null);
+            }
+            catch
+            {
+                result = false;
+            }
+            return result;
+        }
+        private static bool IsInDesignModeNet()
+        {
+            bool result;
+            try
+            {
+                Type type = Type.GetType("System.ComponentModel.DesignerProperties, PresentationFramework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                object value = type.GetTypeInfo().GetDeclaredField("IsInDesignModeProperty").GetValue(null);
+                Type type2 = Type.GetType("System.ComponentModel.DependencyPropertyDescriptor, WindowsBase, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                Type type3 = Type.GetType("System.Windows.FrameworkElement, PresentationFramework, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                IEnumerable<MethodInfo> declaredMethods = type2.GetTypeInfo().GetDeclaredMethods("FromProperty");
+                MethodInfo methodInfo = null;
+                foreach (MethodInfo current in declaredMethods)
+                {
+                    if (current.IsPublic && current.IsStatic && current.GetParameters().Length == 2)
+                    {
+                        methodInfo = current;
+                        break;
+                    }
+                }
+                if (methodInfo == null)
+                {
+                    result = false;
+                }
+                else
+                {
+                    object obj = methodInfo.Invoke(null, new object[]
+					{
+						value,
+						type3
+					});
+                    PropertyInfo declaredProperty = type2.GetTypeInfo().GetDeclaredProperty("Metadata");
+                    object value2 = declaredProperty.GetValue(obj, null);
+                    Type type4 = Type.GetType("System.Windows.PropertyMetadata, WindowsBase, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35");
+                    PropertyInfo declaredProperty2 = type4.GetTypeInfo().GetDeclaredProperty("DefaultValue");
+                    bool flag = (bool)declaredProperty2.GetValue(value2, null);
+                    result = flag;
+                }
+            }
+            catch
+            {
+                result = false;
+            }
+            return result;
+        }
+
         /// <summary>
         /// Unregisters this instance from the Messenger class.
         /// <para>To cleanup additional resources, override this method, clean
@@ -271,11 +388,8 @@ namespace Silverlight.MVVM.Core
         public virtual void Cleanup()
         {
             this.MessengerInstance.Unregister(this);
-            if (m_InitArgs != null) GC.SuppressFinalize(m_InitArgs);
-            m_InitArgs = null;
-            if (m_ViewControl != null) GC.SuppressFinalize(m_ViewControl);
-            m_ViewControl = null;
         }
+
         /// <summary>
         /// Broadcasts a PropertyChangedMessage using either the instance of
         /// the Messenger that was passed to this class (if available) 
@@ -294,6 +408,7 @@ namespace Silverlight.MVVM.Core
             PropertyChangedMessage<T> message = new PropertyChangedMessage<T>(this, oldValue, newValue, propertyName);
             this.MessengerInstance.Send<PropertyChangedMessage<T>>(message);
         }
+
         /// <summary>
         /// Raises the PropertyChanged event if needed, and broadcasts a
         /// PropertyChangedMessage using the Messenger instance (or the
@@ -312,7 +427,7 @@ namespace Silverlight.MVVM.Core
         /// <remarks>If the propertyName parameter
         /// does not correspond to an existing property on the current class, an
         /// exception is thrown in DEBUG configuration only.</remarks>
-        protected virtual void RaisePropertyChanged<T>(string propertyName, T oldValue, T newValue, bool broadcast)
+        protected virtual void RaisePropertyChanged<T>([CallerMemberName] string propertyName = null, T oldValue = default(T), T newValue = default(T), bool broadcast = false)
         {
             if (string.IsNullOrEmpty(propertyName))
             {
@@ -324,6 +439,7 @@ namespace Silverlight.MVVM.Core
                 this.Broadcast<T>(oldValue, newValue, propertyName);
             }
         }
+
         /// <summary>
         /// Raises the PropertyChanged event if needed, and broadcasts a
         /// PropertyChangedMessage using the Messenger instance (or the
@@ -344,10 +460,10 @@ namespace Silverlight.MVVM.Core
             PropertyChangedEventHandler propertyChangedHandler = base.PropertyChangedHandler;
             if (propertyChangedHandler != null || broadcast)
             {
-                string propertyName = base.GetPropertyName<T>(propertyExpression);
+                string propertyName = ObservableObject.GetPropertyName<T>(propertyExpression);
                 if (propertyChangedHandler != null)
                 {
-                    propertyChangedHandler.Invoke(this, new PropertyChangedEventArgs(propertyName));
+                    propertyChangedHandler(this, new PropertyChangedEventArgs(propertyName));
                 }
                 if (broadcast)
                 {
@@ -355,6 +471,7 @@ namespace Silverlight.MVVM.Core
                 }
             }
         }
+
         /// <summary>
         /// Assigns a new value to the property. Then, raises the
         /// PropertyChanged event if needed, and broadcasts a
@@ -370,6 +487,7 @@ namespace Silverlight.MVVM.Core
         /// occurred.</param>
         /// <param name="broadcast">If true, a PropertyChangedMessage will
         /// be broadcasted. If false, only the event will be raised.</param>
+        /// <returns>True if the PropertyChanged event was raised, false otherwise.</returns>
         protected bool Set<T>(Expression<Func<T>> propertyExpression, ref T field, T newValue, bool broadcast)
         {
             if (EqualityComparer<T>.Default.Equals(field, newValue))
@@ -381,6 +499,7 @@ namespace Silverlight.MVVM.Core
             this.RaisePropertyChanged<T>(propertyExpression, oldValue, field, broadcast);
             return true;
         }
+
         /// <summary>
         /// Assigns a new value to the property. Then, raises the
         /// PropertyChanged event if needed, and broadcasts a
@@ -396,7 +515,36 @@ namespace Silverlight.MVVM.Core
         /// occurred.</param>
         /// <param name="broadcast">If true, a PropertyChangedMessage will
         /// be broadcasted. If false, only the event will be raised.</param>
-        protected bool Set<T>(string propertyName, ref T field, T newValue, bool broadcast)
+        /// <returns>True if the PropertyChanged event was raised, false otherwise.</returns>
+        protected bool Set<T>(string propertyName, ref T field, T newValue = default(T), bool broadcast = false)
+        {
+            if (EqualityComparer<T>.Default.Equals(field, newValue))
+            {
+                return false;
+            }
+            T oldValue = field;
+            field = newValue;
+            this.RaisePropertyChanged<T>(propertyName, oldValue, field, broadcast);
+            return true;
+        }
+
+        /// <summary>
+        /// Assigns a new value to the property. Then, raises the
+        /// PropertyChanged event if needed, and broadcasts a
+        /// PropertyChangedMessage using the Messenger instance (or the
+        /// static default instance if no Messenger instance is available). 
+        /// </summary>
+        /// <typeparam name="T">The type of the property that
+        /// changed.</typeparam>
+        /// <param name="field">The field storing the property's value.</param>
+        /// <param name="newValue">The property's value after the change
+        /// occurred.</param>
+        /// <param name="broadcast">If true, a PropertyChangedMessage will
+        /// be broadcasted. If false, only the event will be raised.</param>
+        /// <param name="propertyName">(optional) The name of the property that
+        /// changed.</param>
+        /// <returns>True if the PropertyChanged event was raised, false otherwise.</returns>
+        protected bool Set<T>(ref T field, T newValue = default(T), bool broadcast = false, [CallerMemberName] string propertyName = null)
         {
             if (EqualityComparer<T>.Default.Equals(field, newValue))
             {
@@ -428,7 +576,7 @@ namespace Silverlight.MVVM.Core
         public TControl FindViewControlChild<TControl>(string controlname) where TControl : DependencyObject
         {
             TControl rst = null;
-            if (m_ViewControl != null && m_ViewControl.GetType().IsSubclassOf(typeof(Control)))
+            if (m_ViewControl != null && m_ViewControl.GetType().GetTypeInfo().IsSubclassOf(typeof(Control)))
             {
                 object obj = ((Control)m_ViewControl).FindName(controlname);
                 if (obj != null)
